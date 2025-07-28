@@ -19,27 +19,20 @@ jobs:
           ref: main
           token: ${{ secrets.TOKEN }}  # Personal Access Token 사용
 
-      - name: Get commit message from CI workflow
-        id: get_message
+      - name: Update app.tag in values.yaml using commit message
         run: |
           SAFE_TAG=$(echo "${{ github.event.workflow_run.head_commit.message }}" | tr -s ' ' '-' | tr -dc '[:alnum:]-')
-          awk '
+          echo "Using tag: $SAFE_TAG"
+
+          awk -v tag="$SAFE_TAG" '
           /^app:/ { in_app=1; print; next }
           in_app && /^\s*tag:/ {
-          print "  tag: '"$SAFE_TAG"'"
-          in_app=0
-          next
+            print "  tag: " tag
+            in_app=0
+            next
           }
           { print }
           ' values.yaml > tmp.yaml && mv tmp.yaml values.yaml
-
-        env:
-          GH_TOKEN: ${{ secrets.TOKEN }}
-
-      - name: Update tag in values.yaml
-        run: |
-          cd charts/myapp
-          sed -i "s/^\(\s*tag:\s*\).*/\1${{ steps.get_message.outputs.message }}/" values.yaml
 
       - name: Set up Git user
         run: |
@@ -48,6 +41,6 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git add .
-          git commit -m "${{ steps.get_message.outputs.message }}" || echo "No changes to commit"
+          git add values.yaml
+          git commit -m "Update app tag from commit message" || echo "No changes to commit"
           git push origin main
