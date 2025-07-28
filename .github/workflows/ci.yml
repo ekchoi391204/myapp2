@@ -48,16 +48,16 @@ jobs:
           docker push public.ecr.aws/${{ secrets.PUBLIC_ECR_ALIAS }}/${{ secrets.PUBLIC_ECR_REPOSITORY }}:latest
 
 
-### EKS 배포 ###
+# ### EKS 배포 ###
 
-      - name: Update kubeconfig for EKS
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ secrets.EKS_REGION }} \
-            --name ${{ secrets.EKS_CLUSTER_NAME }}
+#       - name: Update kubeconfig for EKS
+#         run: |
+#           aws eks update-kubeconfig \
+#             --region ${{ secrets.EKS_REGION }} \
+#             --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-      - name: Set image and deploy to EKS
-        run: |
-          kubectl set image deployment/${{ secrets.K8S_DEPLOYMENT_NAME }} \
-            ${{ secrets.K8S_CONTAINER_NAME }}=public.ecr.aws/${{ secrets.PUBLIC_ECR_ALIAS }}/${{ secrets.PUBLIC_ECR_REPOSITORY }}:${{ env.RELEASE_VERSION }} \
-            -n ${{ secrets.K8S_NAMESPACE }}
+#       - name: Set image and deploy to EKS
+#         run: |
+#           kubectl set image deployment/${{ secrets.K8S_DEPLOYMENT_NAME }} \
+#             ${{ secrets.K8S_CONTAINER_NAME }}=public.ecr.aws/${{ secrets.PUBLIC_ECR_ALIAS }}/${{ secrets.PUBLIC_ECR_REPOSITORY }}:${{ env.RELEASE_VERSION }} \
+#             -n ${{ secrets.K8S_NAMESPACE }}
