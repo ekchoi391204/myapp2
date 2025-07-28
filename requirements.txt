@@ -1,0 +1,6 @@
+flask
+flask-login
+flask-mysqldb
+flask-session
+redis
+werkzeug
