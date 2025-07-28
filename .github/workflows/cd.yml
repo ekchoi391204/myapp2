@@ -22,8 +22,17 @@ jobs:
       - name: Get commit message from CI workflow
         id: get_message
         run: |
-          COMMIT_MESSAGE=$(gh api repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }} --jq .commit.message)
-          echo "message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          SAFE_TAG=$(echo "${{ github.event.workflow_run.head_commit.message }}" | tr -s ' ' '-' | tr -dc '[:alnum:]-')
+          awk '
+          /^app:/ { in_app=1; print; next }
+          in_app && /^\s*tag:/ {
+          print "  tag: '"$SAFE_TAG"'"
+          in_app=0
+          next
+          }
+          { print }
+          ' values.yaml > tmp.yaml && mv tmp.yaml values.yaml
+
         env:
           GH_TOKEN: ${{ secrets.TOKEN }}
 
