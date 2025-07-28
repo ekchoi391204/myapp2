@@ -1,0 +1,43 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    conclusions:
+      - success     
+
+jobs:
+  use-commit-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CD repository
+        uses: actions/checkout@v4
+        with:
+          repository: ekchoi391204/k8s-helm2 #helm chart reposytory git
+          ref: main
+          token: ${{ secrets.TOKEN }}  # 매우 중요
+      
+      - name: List files in the checked-out repository
+        run: ls -l
+      - name: Update Kubernetes resources
+        run: |
+          cd charts/myapp
+          ls -al 
+          TAG=$(echo "${{ github.event.workflow_run.head_commit.message }}" | tr -d '\n')
+          sed -i "s/^\(\s*tag:\s*\).*/\1${TAG}/" values.yaml
+          
+      - name: Set up Git user
+        run: |
+          git config --global user.name "ekchoi3912"
+          git config --global user.email "ekchoi391204@gmail.com"
+
+      - name: Add remote repository
+        run: git remote add target_repo git@github.com:ekchoi391204/k8s-helm2.git
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "${{ github.event.workflow_run.head_commit.message }}"
+          git push target_repo main
