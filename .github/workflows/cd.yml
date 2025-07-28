@@ -17,14 +17,13 @@ jobs:
         with:
           repository: ekchoi391204/k8s-helm2
           ref: main
-          token: ${{ secrets.TOKEN }}  # Personal Access Token 사용
+          token: ${{ secrets.TOKEN }}
 
       - name: Update app.tag in values.yaml using commit message
         run: |
           cd myapp-chart
           SAFE_TAG=$(echo "${{ github.event.workflow_run.head_commit.message }}" | tr -s ' ' '-' | tr -dc '[:alnum:]-')
           echo "Using tag: $SAFE_TAG"
-
           awk -v tag="$SAFE_TAG" '
           /^app:/ { in_app=1; print; next }
           in_app && /^\s*tag:/ {
@@ -42,6 +41,6 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git add values.yaml
+          git add myapp-chart/values.yaml
           git commit -m "Update app tag from commit message" || echo "No changes to commit"
           git push origin main
