@@ -39,8 +39,8 @@ jobs:
           git config --global user.name "ekchoi3912"
           git config --global user.email "ekchoi391204@gmail.com"
 
-      - name: Commit and push changes
-        run: |
-          git add charts/myapp-chart/values.yaml
-          git commit -m "Update app tag from commit message" || echo "No changes to commit"
-          git push origin main
+      # - name: Commit and push changes
+      #   run: |
+      #     git add charts/myapp-chart/values.yaml
+      #     git commit -m "Update app tag from commit message" || echo "No changes to commit"
+      #     git push origin main
