@@ -21,7 +21,7 @@ jobs:
 
       - name: Update app.tag in values.yaml using commit message
         run: |
-          cd myapp-chart
+          cd chart/myapp-chart
           SAFE_TAG=$(echo "${{ github.event.workflow_run.head_commit.message }}" | tr -s ' ' '-' | tr -dc '[:alnum:]-')
           echo "Using tag: $SAFE_TAG"
           awk -v tag="$SAFE_TAG" '
@@ -41,6 +41,6 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git add myapp-chart/values.yaml
+          git add chart/myapp-chart/values.yaml
           git commit -m "Update app tag from commit message" || echo "No changes to commit"
           git push origin main
